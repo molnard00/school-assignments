@@ -1,0 +1,535 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 54,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import pandas as pd \n",
+    "import matplotlib.pyplot as plt\n",
+    "import seaborn as sns\n",
+    "\n",
+    "diabetes = pd.DataFrame(pd.read_csv(\"https://raw.githubusercontent.com/molnard00/school-assignments/main/diabetes.csv\"))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 55,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Problem 1\n",
+    "M = len(diabetes)\n",
+    "\n",
+    "diabX = diabetes.iloc[:,0:8].values\n",
+    "diabY = diabetes.iloc[:,8].values"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 56,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.model_selection import train_test_split\n",
+    "\n",
+    "X_train, X_test, y_train, y_test = train_test_split( diabX, diabY, test_size=0.2, random_state=1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 57,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.preprocessing import StandardScaler\n",
+    "scaler = StandardScaler()\n",
+    "X_train = scaler.fit_transform(X_train)\n",
+    "X_test = scaler.transform(X_test)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 58,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], dtype=int64)"
+      ]
+     },
+     "execution_count": 58,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "from sklearn.linear_model import LogisticRegression\n",
+    "clf = LogisticRegression(random_state=0).fit(X_train, y_train)\n",
+    "\n",
+    "Ypredict = clf.predict(X_test)\n",
+    "Ypredict[0:15]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 59,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([[89, 10],\n",
+       "       [24, 31]], dtype=int64)"
+      ]
+     },
+     "execution_count": 59,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "from sklearn.metrics import confusion_matrix\n",
+    "\n",
+    "conf_matrix = confusion_matrix(y_test, Ypredict)\n",
+    "conf_matrix"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 60,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Accuracy for Problem 1: 0.7792207792207793\n",
+      "Precision for Problem 1: 0.7560975609756098\n",
+      "Recall for Problem 1: 0.5636363636363636\n"
+     ]
+    }
+   ],
+   "source": [
+    "from sklearn import metrics\n",
+    "\n",
+    "Acc1 = metrics.accuracy_score(y_test, Ypredict)\n",
+    "Prec1 = metrics.precision_score(y_test, Ypredict)\n",
+    "Rec1 = metrics.recall_score(y_test, Ypredict)\n",
+    "\n",
+    "print(\"Accuracy for Problem 1:\", Acc1)\n",
+    "print(\"Precision for Problem 1:\", Prec1)\n",
+    "print(\"Recall for Problem 1:\", Rec1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 61,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Text(0.5, 15.0, 'Prediction')"
+      ]
+     },
+     "execution_count": 61,
+     "metadata": {},
+     "output_type": "execute_result"
+    },
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 2 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "figure, axis = plt.subplots()\n",
+    "\n",
+    "ticks = np.arange(len([0,1]))\n",
+    "plt.xticks(ticks, [0,1]) \n",
+    "plt.yticks(ticks, [0,1]) \n",
+    "sns.heatmap(pd.DataFrame(conf_matrix), annot=True ,fmt='g')\n",
+    "\n",
+    "plt.tight_layout() \n",
+    "plt.title('Confusion matrix', y=1) \n",
+    "plt.ylabel('Actual') \n",
+    "plt.xlabel('Prediction')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 62,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "GaussianNB(priors=None, var_smoothing=1e-09)"
+      ]
+     },
+     "execution_count": 62,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "#problem 2\n",
+    "\n",
+    "from sklearn.naive_bayes import GaussianNB\n",
+    "clf = GaussianNB()\n",
+    "clf.fit(X_train, y_train)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 63,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Accuracy for Problem 2: 0.7727272727272727\n",
+      "Precision for Problem 2: 0.7083333333333334\n",
+      "Recall for Problem 2: 0.6181818181818182\n"
+     ]
+    }
+   ],
+   "source": [
+    "Ypred2 =  clf.predict(X_test)\n",
+    "Acc2 = metrics.accuracy_score(y_test, Ypred2)\n",
+    "Prec2 = metrics.precision_score(y_test, Ypred2)\n",
+    "Rec2 = metrics.recall_score(y_test, Ypred2)\n",
+    "\n",
+    "print(\"Accuracy for Problem 2:\", Acc2)\n",
+    "print(\"Precision for Problem 2:\", Prec2)\n",
+    "print(\"Recall for Problem 2:\", Rec2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 64,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([[85, 14],\n",
+       "       [21, 34]], dtype=int64)"
+      ]
+     },
+     "execution_count": 64,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "from sklearn.metrics import accuracy_score \n",
+    "conf_matrix = confusion_matrix(y_test, Ypred2)\n",
+    "conf_matrix"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 65,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Text(0.5, 15.0, 'Prediction')"
+      ]
+     },
+     "execution_count": 65,
+     "metadata": {},
+     "output_type": "execute_result"
+    },
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 2 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "figure, axis = plt.subplots()\n",
+    "\n",
+    "ticks = np.arange(len([0,1]))\n",
+    "plt.xticks(ticks, [0,1]) \n",
+    "plt.yticks(ticks, [0,1]) \n",
+    "sns.heatmap(pd.DataFrame(conf_matrix), annot=True ,fmt='g')\n",
+    "\n",
+    "plt.tight_layout() \n",
+    "plt.title('Confusion matrix', y=1) \n",
+    "plt.ylabel('Actual') \n",
+    "plt.xlabel('Prediction')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 66,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#problem 3\n",
+    "\n",
+    "from sklearn.model_selection import KFold\n",
+    "from sklearn.model_selection import cross_validate\n",
+    "from sklearn.model_selection import cross_val_score"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 67,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Accuracy 0.7566080977845684\n",
+      "Precision 0.6345484277924214\n",
+      "Recall 0.7240391334730958\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "C:\\Users\\Molna\\anaconda3\\lib\\site-packages\\sklearn\\linear_model\\_logistic.py:940: ConvergenceWarning: lbfgs failed to converge (status=1):\n",
+      "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.\n",
+      "\n",
+      "Increase the number of iterations (max_iter) or scale the data as shown in:\n",
+      "    https://scikit-learn.org/stable/modules/preprocessing.html\n",
+      "Please also refer to the documentation for alternative solver options:\n",
+      "    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression\n",
+      "  extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG)\n",
+      "C:\\Users\\Molna\\anaconda3\\lib\\site-packages\\sklearn\\linear_model\\_logistic.py:940: ConvergenceWarning: lbfgs failed to converge (status=1):\n",
+      "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.\n",
+      "\n",
+      "Increase the number of iterations (max_iter) or scale the data as shown in:\n",
+      "    https://scikit-learn.org/stable/modules/preprocessing.html\n",
+      "Please also refer to the documentation for alternative solver options:\n",
+      "    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression\n",
+      "  extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG)\n",
+      "C:\\Users\\Molna\\anaconda3\\lib\\site-packages\\sklearn\\linear_model\\_logistic.py:940: ConvergenceWarning: lbfgs failed to converge (status=1):\n",
+      "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.\n",
+      "\n",
+      "Increase the number of iterations (max_iter) or scale the data as shown in:\n",
+      "    https://scikit-learn.org/stable/modules/preprocessing.html\n",
+      "Please also refer to the documentation for alternative solver options:\n",
+      "    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression\n",
+      "  extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG)\n",
+      "C:\\Users\\Molna\\anaconda3\\lib\\site-packages\\sklearn\\linear_model\\_logistic.py:940: ConvergenceWarning: lbfgs failed to converge (status=1):\n",
+      "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.\n",
+      "\n",
+      "Increase the number of iterations (max_iter) or scale the data as shown in:\n",
+      "    https://scikit-learn.org/stable/modules/preprocessing.html\n",
+      "Please also refer to the documentation for alternative solver options:\n",
+      "    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression\n",
+      "  extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG)\n",
+      "C:\\Users\\Molna\\anaconda3\\lib\\site-packages\\sklearn\\linear_model\\_logistic.py:940: ConvergenceWarning: lbfgs failed to converge (status=1):\n",
+      "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.\n",
+      "\n",
+      "Increase the number of iterations (max_iter) or scale the data as shown in:\n",
+      "    https://scikit-learn.org/stable/modules/preprocessing.html\n",
+      "Please also refer to the documentation for alternative solver options:\n",
+      "    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression\n",
+      "  extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG)\n"
+     ]
+    }
+   ],
+   "source": [
+    "clf3 = LogisticRegression(class_weight = 'balanced')\n",
+    "validation = {\"accuracy\": \"accuracy\", \"precision\": \"precision\", \"recall\": \"recall\"}\n",
+    "\n",
+    "cross_val = cross_validate(clf3, diabX, diabY, cv = 5, groups = None, scoring = validation)\n",
+    "\n",
+    "print('Accuracy', np.mean(cross_val['test_accuracy']))\n",
+    "print('Precision', np.mean(cross_val['test_precision']))\n",
+    "print('Recall', np.mean(cross_val['test_recall']))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 68,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "C:\\Users\\Molna\\anaconda3\\lib\\site-packages\\sklearn\\linear_model\\_logistic.py:940: ConvergenceWarning: lbfgs failed to converge (status=1):\n",
+      "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.\n",
+      "\n",
+      "Increase the number of iterations (max_iter) or scale the data as shown in:\n",
+      "    https://scikit-learn.org/stable/modules/preprocessing.html\n",
+      "Please also refer to the documentation for alternative solver options:\n",
+      "    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression\n",
+      "  extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG)\n",
+      "C:\\Users\\Molna\\anaconda3\\lib\\site-packages\\sklearn\\linear_model\\_logistic.py:940: ConvergenceWarning: lbfgs failed to converge (status=1):\n",
+      "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.\n",
+      "\n",
+      "Increase the number of iterations (max_iter) or scale the data as shown in:\n",
+      "    https://scikit-learn.org/stable/modules/preprocessing.html\n",
+      "Please also refer to the documentation for alternative solver options:\n",
+      "    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression\n",
+      "  extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG)\n",
+      "C:\\Users\\Molna\\anaconda3\\lib\\site-packages\\sklearn\\linear_model\\_logistic.py:940: ConvergenceWarning: lbfgs failed to converge (status=1):\n",
+      "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.\n",
+      "\n",
+      "Increase the number of iterations (max_iter) or scale the data as shown in:\n",
+      "    https://scikit-learn.org/stable/modules/preprocessing.html\n",
+      "Please also refer to the documentation for alternative solver options:\n",
+      "    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression\n",
+      "  extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG)\n",
+      "C:\\Users\\Molna\\anaconda3\\lib\\site-packages\\sklearn\\linear_model\\_logistic.py:940: ConvergenceWarning: lbfgs failed to converge (status=1):\n",
+      "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.\n",
+      "\n",
+      "Increase the number of iterations (max_iter) or scale the data as shown in:\n",
+      "    https://scikit-learn.org/stable/modules/preprocessing.html\n",
+      "Please also refer to the documentation for alternative solver options:\n",
+      "    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression\n",
+      "  extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG)\n",
+      "C:\\Users\\Molna\\anaconda3\\lib\\site-packages\\sklearn\\linear_model\\_logistic.py:940: ConvergenceWarning: lbfgs failed to converge (status=1):\n",
+      "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.\n",
+      "\n",
+      "Increase the number of iterations (max_iter) or scale the data as shown in:\n",
+      "    https://scikit-learn.org/stable/modules/preprocessing.html\n",
+      "Please also refer to the documentation for alternative solver options:\n",
+      "    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression\n",
+      "  extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG)\n",
+      "C:\\Users\\Molna\\anaconda3\\lib\\site-packages\\sklearn\\linear_model\\_logistic.py:940: ConvergenceWarning: lbfgs failed to converge (status=1):\n",
+      "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.\n",
+      "\n",
+      "Increase the number of iterations (max_iter) or scale the data as shown in:\n",
+      "    https://scikit-learn.org/stable/modules/preprocessing.html\n",
+      "Please also refer to the documentation for alternative solver options:\n",
+      "    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression\n",
+      "  extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG)\n",
+      "C:\\Users\\Molna\\anaconda3\\lib\\site-packages\\sklearn\\linear_model\\_logistic.py:940: ConvergenceWarning: lbfgs failed to converge (status=1):\n",
+      "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.\n",
+      "\n",
+      "Increase the number of iterations (max_iter) or scale the data as shown in:\n",
+      "    https://scikit-learn.org/stable/modules/preprocessing.html\n",
+      "Please also refer to the documentation for alternative solver options:\n",
+      "    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression\n",
+      "  extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG)\n",
+      "C:\\Users\\Molna\\anaconda3\\lib\\site-packages\\sklearn\\linear_model\\_logistic.py:940: ConvergenceWarning: lbfgs failed to converge (status=1):\n",
+      "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.\n",
+      "\n",
+      "Increase the number of iterations (max_iter) or scale the data as shown in:\n",
+      "    https://scikit-learn.org/stable/modules/preprocessing.html\n",
+      "Please also refer to the documentation for alternative solver options:\n",
+      "    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression\n",
+      "  extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG)\n",
+      "C:\\Users\\Molna\\anaconda3\\lib\\site-packages\\sklearn\\linear_model\\_logistic.py:940: ConvergenceWarning: lbfgs failed to converge (status=1):\n",
+      "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.\n",
+      "\n",
+      "Increase the number of iterations (max_iter) or scale the data as shown in:\n",
+      "    https://scikit-learn.org/stable/modules/preprocessing.html\n",
+      "Please also refer to the documentation for alternative solver options:\n",
+      "    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression\n",
+      "  extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG)\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Accuracy 0.7565447710184553\n",
+      "Precision 0.6368430481889882\n",
+      "Recall 0.7276353276353277\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "C:\\Users\\Molna\\anaconda3\\lib\\site-packages\\sklearn\\linear_model\\_logistic.py:940: ConvergenceWarning: lbfgs failed to converge (status=1):\n",
+      "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.\n",
+      "\n",
+      "Increase the number of iterations (max_iter) or scale the data as shown in:\n",
+      "    https://scikit-learn.org/stable/modules/preprocessing.html\n",
+      "Please also refer to the documentation for alternative solver options:\n",
+      "    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression\n",
+      "  extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG)\n"
+     ]
+    }
+   ],
+   "source": [
+    "cross_val2 = cross_validate(clf3, diabX, diabY, cv = 10, groups = None, scoring = validation)\n",
+    "\n",
+    "print('Accuracy', np.mean(cross_val2['test_accuracy']))\n",
+    "print('Precision', np.mean(cross_val2['test_precision']))\n",
+    "print('Recall', np.mean(cross_val2['test_recall']))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
