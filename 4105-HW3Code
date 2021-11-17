@@ -1,0 +1,853 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "slideshow": {
+     "slide_type": "slide"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "import pandas as pd\n",
+    "import seaborn as sns\n",
+    "from sklearn.datasets import load_breast_cancer\n",
+    "from sklearn.model_selection import train_test_split\n",
+    "from sklearn.preprocessing import StandardScaler\n",
+    "from sklearn.linear_model import LogisticRegression\n",
+    "from sklearn.metrics import confusion_matrix\n",
+    "from sklearn import metrics\n",
+    "\n",
+    "#David Molnar"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 37,
+   "metadata": {
+    "slideshow": {
+     "slide_type": "slide"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "breast = load_breast_cancer()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 38,
+   "metadata": {
+    "slideshow": {
+     "slide_type": "slide"
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(569, 30)"
+      ]
+     },
+     "execution_count": 38,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "breast_data = breast.data \n",
+    "breast_data.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "metadata": {
+    "slideshow": {
+     "slide_type": "slide"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "breast_input = pd.DataFrame(breast_data)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 40,
+   "metadata": {
+    "slideshow": {
+     "slide_type": "slide"
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(569,)"
+      ]
+     },
+     "execution_count": 40,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "breast_labels = breast.target\n",
+    "breast_labels.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 41,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "labels = np.reshape(breast_labels,(569,1)) "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 42,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "final_breast_data = np.concatenate([breast_data,labels],axis=1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 43,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "breast_dataset = pd.DataFrame(final_breast_data)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 44,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "features = breast.feature_names"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 45,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "features_labels = np.append(features,'label')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 46,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>mean radius</th>\n",
+       "      <th>mean texture</th>\n",
+       "      <th>mean perimeter</th>\n",
+       "      <th>mean area</th>\n",
+       "      <th>mean smoothness</th>\n",
+       "      <th>mean compactness</th>\n",
+       "      <th>mean concavity</th>\n",
+       "      <th>mean concave points</th>\n",
+       "      <th>mean symmetry</th>\n",
+       "      <th>mean fractal dimension</th>\n",
+       "      <th>...</th>\n",
+       "      <th>worst texture</th>\n",
+       "      <th>worst perimeter</th>\n",
+       "      <th>worst area</th>\n",
+       "      <th>worst smoothness</th>\n",
+       "      <th>worst compactness</th>\n",
+       "      <th>worst concavity</th>\n",
+       "      <th>worst concave points</th>\n",
+       "      <th>worst symmetry</th>\n",
+       "      <th>worst fractal dimension</th>\n",
+       "      <th>label</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>17.99</td>\n",
+       "      <td>10.38</td>\n",
+       "      <td>122.80</td>\n",
+       "      <td>1001.0</td>\n",
+       "      <td>0.11840</td>\n",
+       "      <td>0.27760</td>\n",
+       "      <td>0.3001</td>\n",
+       "      <td>0.14710</td>\n",
+       "      <td>0.2419</td>\n",
+       "      <td>0.07871</td>\n",
+       "      <td>...</td>\n",
+       "      <td>17.33</td>\n",
+       "      <td>184.60</td>\n",
+       "      <td>2019.0</td>\n",
+       "      <td>0.1622</td>\n",
+       "      <td>0.6656</td>\n",
+       "      <td>0.7119</td>\n",
+       "      <td>0.2654</td>\n",
+       "      <td>0.4601</td>\n",
+       "      <td>0.11890</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>20.57</td>\n",
+       "      <td>17.77</td>\n",
+       "      <td>132.90</td>\n",
+       "      <td>1326.0</td>\n",
+       "      <td>0.08474</td>\n",
+       "      <td>0.07864</td>\n",
+       "      <td>0.0869</td>\n",
+       "      <td>0.07017</td>\n",
+       "      <td>0.1812</td>\n",
+       "      <td>0.05667</td>\n",
+       "      <td>...</td>\n",
+       "      <td>23.41</td>\n",
+       "      <td>158.80</td>\n",
+       "      <td>1956.0</td>\n",
+       "      <td>0.1238</td>\n",
+       "      <td>0.1866</td>\n",
+       "      <td>0.2416</td>\n",
+       "      <td>0.1860</td>\n",
+       "      <td>0.2750</td>\n",
+       "      <td>0.08902</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>19.69</td>\n",
+       "      <td>21.25</td>\n",
+       "      <td>130.00</td>\n",
+       "      <td>1203.0</td>\n",
+       "      <td>0.10960</td>\n",
+       "      <td>0.15990</td>\n",
+       "      <td>0.1974</td>\n",
+       "      <td>0.12790</td>\n",
+       "      <td>0.2069</td>\n",
+       "      <td>0.05999</td>\n",
+       "      <td>...</td>\n",
+       "      <td>25.53</td>\n",
+       "      <td>152.50</td>\n",
+       "      <td>1709.0</td>\n",
+       "      <td>0.1444</td>\n",
+       "      <td>0.4245</td>\n",
+       "      <td>0.4504</td>\n",
+       "      <td>0.2430</td>\n",
+       "      <td>0.3613</td>\n",
+       "      <td>0.08758</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>11.42</td>\n",
+       "      <td>20.38</td>\n",
+       "      <td>77.58</td>\n",
+       "      <td>386.1</td>\n",
+       "      <td>0.14250</td>\n",
+       "      <td>0.28390</td>\n",
+       "      <td>0.2414</td>\n",
+       "      <td>0.10520</td>\n",
+       "      <td>0.2597</td>\n",
+       "      <td>0.09744</td>\n",
+       "      <td>...</td>\n",
+       "      <td>26.50</td>\n",
+       "      <td>98.87</td>\n",
+       "      <td>567.7</td>\n",
+       "      <td>0.2098</td>\n",
+       "      <td>0.8663</td>\n",
+       "      <td>0.6869</td>\n",
+       "      <td>0.2575</td>\n",
+       "      <td>0.6638</td>\n",
+       "      <td>0.17300</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>20.29</td>\n",
+       "      <td>14.34</td>\n",
+       "      <td>135.10</td>\n",
+       "      <td>1297.0</td>\n",
+       "      <td>0.10030</td>\n",
+       "      <td>0.13280</td>\n",
+       "      <td>0.1980</td>\n",
+       "      <td>0.10430</td>\n",
+       "      <td>0.1809</td>\n",
+       "      <td>0.05883</td>\n",
+       "      <td>...</td>\n",
+       "      <td>16.67</td>\n",
+       "      <td>152.20</td>\n",
+       "      <td>1575.0</td>\n",
+       "      <td>0.1374</td>\n",
+       "      <td>0.2050</td>\n",
+       "      <td>0.4000</td>\n",
+       "      <td>0.1625</td>\n",
+       "      <td>0.2364</td>\n",
+       "      <td>0.07678</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>5 rows × 31 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   mean radius  mean texture  mean perimeter  mean area  mean smoothness  \\\n",
+       "0        17.99         10.38          122.80     1001.0          0.11840   \n",
+       "1        20.57         17.77          132.90     1326.0          0.08474   \n",
+       "2        19.69         21.25          130.00     1203.0          0.10960   \n",
+       "3        11.42         20.38           77.58      386.1          0.14250   \n",
+       "4        20.29         14.34          135.10     1297.0          0.10030   \n",
+       "\n",
+       "   mean compactness  mean concavity  mean concave points  mean symmetry  \\\n",
+       "0           0.27760          0.3001              0.14710         0.2419   \n",
+       "1           0.07864          0.0869              0.07017         0.1812   \n",
+       "2           0.15990          0.1974              0.12790         0.2069   \n",
+       "3           0.28390          0.2414              0.10520         0.2597   \n",
+       "4           0.13280          0.1980              0.10430         0.1809   \n",
+       "\n",
+       "   mean fractal dimension  ...  worst texture  worst perimeter  worst area  \\\n",
+       "0                 0.07871  ...          17.33           184.60      2019.0   \n",
+       "1                 0.05667  ...          23.41           158.80      1956.0   \n",
+       "2                 0.05999  ...          25.53           152.50      1709.0   \n",
+       "3                 0.09744  ...          26.50            98.87       567.7   \n",
+       "4                 0.05883  ...          16.67           152.20      1575.0   \n",
+       "\n",
+       "   worst smoothness  worst compactness  worst concavity  worst concave points  \\\n",
+       "0            0.1622             0.6656           0.7119                0.2654   \n",
+       "1            0.1238             0.1866           0.2416                0.1860   \n",
+       "2            0.1444             0.4245           0.4504                0.2430   \n",
+       "3            0.2098             0.8663           0.6869                0.2575   \n",
+       "4            0.1374             0.2050           0.4000                0.1625   \n",
+       "\n",
+       "   worst symmetry  worst fractal dimension  label  \n",
+       "0          0.4601                  0.11890    0.0  \n",
+       "1          0.2750                  0.08902    0.0  \n",
+       "2          0.3613                  0.08758    0.0  \n",
+       "3          0.6638                  0.17300    0.0  \n",
+       "4          0.2364                  0.07678    0.0  \n",
+       "\n",
+       "[5 rows x 31 columns]"
+      ]
+     },
+     "execution_count": 46,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "breast_dataset.columns = features_labels\n",
+    "breast_dataset.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 47,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Problem 1\n",
+    "X = breast_dataset.iloc[:, 0:30].values \n",
+    "Y = breast_dataset.iloc[:, 30].values"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 48,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 49,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "scaler = StandardScaler()\n",
+    "#scaling the data\n",
+    "X_train = scaler.fit_transform(X_train)\n",
+    "X_test = scaler.transform(X_test)\n",
+    "Xscale = scaler.fit_transform(X)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 50,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "clf = LogisticRegression(random_state=0).fit(X_train, Y_train)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 51,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "predictY = clf.predict(X_test)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 52,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([[45,  2],\n",
+       "       [ 2, 65]], dtype=int64)"
+      ]
+     },
+     "execution_count": 52,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "confMatrix = confusion_matrix(Y_test, predictY)\n",
+    "confMatrix"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 56,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Accuracy =  0.9649122807017544\n",
+      "Precision =  0.9701492537313433\n",
+      "Recall =  0.9701492537313433\n"
+     ]
+    }
+   ],
+   "source": [
+    "acc = metrics.accuracy_score(Y_test, predictY)\n",
+    "prec = metrics.precision_score(Y_test, predictY) \n",
+    "rec = metrics.recall_score(Y_test, predictY)\n",
+    "print(\"Accuracy = \", acc)\n",
+    "print(\"Precision = \", prec)\n",
+    "print(\"Recall = \", rec)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 62,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Text(0.5, 15.0, 'Prediction')"
+      ]
+     },
+     "execution_count": 62,
+     "metadata": {},
+     "output_type": "execute_result"
+    },
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 2 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "figure, axis = plt.subplots()\n",
+    "\n",
+    "ticks = np.arange(len([0,1]))\n",
+    "plt.xticks(ticks, [0,1])\n",
+    "plt.yticks(ticks, [0,1])\n",
+    "sns.heatmap(pd.DataFrame(confMatrix), annot=True, fmt='g')\n",
+    "\n",
+    "plt.tight_layout()\n",
+    "plt.title('Confusion Matrix', y=1)\n",
+    "plt.ylabel('Actual')\n",
+    "plt.xlabel('Prediction')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 63,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Problem 2\n",
+    "from sklearn.decomposition import PCA "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 64,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>principal component 1</th>\n",
+       "      <th>principal component 2</th>\n",
+       "      <th>principal component 3</th>\n",
+       "      <th>principal component 4</th>\n",
+       "      <th>principal component 5</th>\n",
+       "      <th>principal component 6</th>\n",
+       "      <th>principal component 7</th>\n",
+       "      <th>principal component 8</th>\n",
+       "      <th>principal component 9</th>\n",
+       "      <th>principal component 10</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>9.192837</td>\n",
+       "      <td>1.948583</td>\n",
+       "      <td>-1.123166</td>\n",
+       "      <td>3.633731</td>\n",
+       "      <td>-1.195110</td>\n",
+       "      <td>1.411424</td>\n",
+       "      <td>2.159362</td>\n",
+       "      <td>-0.398427</td>\n",
+       "      <td>-0.157101</td>\n",
+       "      <td>-0.877522</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>2.387802</td>\n",
+       "      <td>-3.768172</td>\n",
+       "      <td>-0.529293</td>\n",
+       "      <td>1.118264</td>\n",
+       "      <td>0.621775</td>\n",
+       "      <td>0.028656</td>\n",
+       "      <td>0.013363</td>\n",
+       "      <td>0.241000</td>\n",
+       "      <td>-0.711917</td>\n",
+       "      <td>1.107061</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>5.733896</td>\n",
+       "      <td>-1.075174</td>\n",
+       "      <td>-0.551748</td>\n",
+       "      <td>0.912083</td>\n",
+       "      <td>-0.177086</td>\n",
+       "      <td>0.541452</td>\n",
+       "      <td>-0.668170</td>\n",
+       "      <td>0.097364</td>\n",
+       "      <td>0.024078</td>\n",
+       "      <td>0.454222</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>7.122953</td>\n",
+       "      <td>10.275589</td>\n",
+       "      <td>-3.232790</td>\n",
+       "      <td>0.152547</td>\n",
+       "      <td>-2.960878</td>\n",
+       "      <td>3.053422</td>\n",
+       "      <td>1.429911</td>\n",
+       "      <td>1.059567</td>\n",
+       "      <td>-1.405437</td>\n",
+       "      <td>-1.116964</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>3.935302</td>\n",
+       "      <td>-1.948072</td>\n",
+       "      <td>1.389767</td>\n",
+       "      <td>2.940639</td>\n",
+       "      <td>0.546747</td>\n",
+       "      <td>-1.226495</td>\n",
+       "      <td>-0.936211</td>\n",
+       "      <td>0.636381</td>\n",
+       "      <td>-0.263811</td>\n",
+       "      <td>0.377734</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>564</th>\n",
+       "      <td>6.439315</td>\n",
+       "      <td>-3.576817</td>\n",
+       "      <td>2.459487</td>\n",
+       "      <td>1.177314</td>\n",
+       "      <td>-0.074824</td>\n",
+       "      <td>-2.375193</td>\n",
+       "      <td>-0.596129</td>\n",
+       "      <td>-0.035470</td>\n",
+       "      <td>0.987932</td>\n",
+       "      <td>0.256996</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>565</th>\n",
+       "      <td>3.793382</td>\n",
+       "      <td>-3.584048</td>\n",
+       "      <td>2.088476</td>\n",
+       "      <td>-2.506028</td>\n",
+       "      <td>-0.510723</td>\n",
+       "      <td>-0.246710</td>\n",
+       "      <td>-0.716326</td>\n",
+       "      <td>-1.113360</td>\n",
+       "      <td>-0.105205</td>\n",
+       "      <td>-0.108631</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>566</th>\n",
+       "      <td>1.256179</td>\n",
+       "      <td>-1.902297</td>\n",
+       "      <td>0.562731</td>\n",
+       "      <td>-2.089227</td>\n",
+       "      <td>1.809991</td>\n",
+       "      <td>-0.534447</td>\n",
+       "      <td>-0.192756</td>\n",
+       "      <td>0.341891</td>\n",
+       "      <td>0.393914</td>\n",
+       "      <td>0.520902</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>567</th>\n",
+       "      <td>10.374794</td>\n",
+       "      <td>1.672010</td>\n",
+       "      <td>-1.877029</td>\n",
+       "      <td>-2.356031</td>\n",
+       "      <td>-0.033742</td>\n",
+       "      <td>0.567936</td>\n",
+       "      <td>0.223077</td>\n",
+       "      <td>-0.280249</td>\n",
+       "      <td>-0.542025</td>\n",
+       "      <td>-0.089362</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>568</th>\n",
+       "      <td>-5.475243</td>\n",
+       "      <td>-0.670637</td>\n",
+       "      <td>1.490443</td>\n",
+       "      <td>-2.299157</td>\n",
+       "      <td>-0.184703</td>\n",
+       "      <td>1.617837</td>\n",
+       "      <td>1.698949</td>\n",
+       "      <td>1.046348</td>\n",
+       "      <td>0.374103</td>\n",
+       "      <td>-0.047763</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>569 rows × 10 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "     principal component 1  principal component 2  principal component 3  \\\n",
+       "0                 9.192837               1.948583              -1.123166   \n",
+       "1                 2.387802              -3.768172              -0.529293   \n",
+       "2                 5.733896              -1.075174              -0.551748   \n",
+       "3                 7.122953              10.275589              -3.232790   \n",
+       "4                 3.935302              -1.948072               1.389767   \n",
+       "..                     ...                    ...                    ...   \n",
+       "564               6.439315              -3.576817               2.459487   \n",
+       "565               3.793382              -3.584048               2.088476   \n",
+       "566               1.256179              -1.902297               0.562731   \n",
+       "567              10.374794               1.672010              -1.877029   \n",
+       "568              -5.475243              -0.670637               1.490443   \n",
+       "\n",
+       "     principal component 4  principal component 5  principal component 6  \\\n",
+       "0                 3.633731              -1.195110               1.411424   \n",
+       "1                 1.118264               0.621775               0.028656   \n",
+       "2                 0.912083              -0.177086               0.541452   \n",
+       "3                 0.152547              -2.960878               3.053422   \n",
+       "4                 2.940639               0.546747              -1.226495   \n",
+       "..                     ...                    ...                    ...   \n",
+       "564               1.177314              -0.074824              -2.375193   \n",
+       "565              -2.506028              -0.510723              -0.246710   \n",
+       "566              -2.089227               1.809991              -0.534447   \n",
+       "567              -2.356031              -0.033742               0.567936   \n",
+       "568              -2.299157              -0.184703               1.617837   \n",
+       "\n",
+       "     principal component 7  principal component 8  principal component 9  \\\n",
+       "0                 2.159362              -0.398427              -0.157101   \n",
+       "1                 0.013363               0.241000              -0.711917   \n",
+       "2                -0.668170               0.097364               0.024078   \n",
+       "3                 1.429911               1.059567              -1.405437   \n",
+       "4                -0.936211               0.636381              -0.263811   \n",
+       "..                     ...                    ...                    ...   \n",
+       "564              -0.596129              -0.035470               0.987932   \n",
+       "565              -0.716326              -1.113360              -0.105205   \n",
+       "566              -0.192756               0.341891               0.393914   \n",
+       "567               0.223077              -0.280249              -0.542025   \n",
+       "568               1.698949               1.046348               0.374103   \n",
+       "\n",
+       "     principal component 10  \n",
+       "0                 -0.877522  \n",
+       "1                  1.107061  \n",
+       "2                  0.454222  \n",
+       "3                 -1.116964  \n",
+       "4                  0.377734  \n",
+       "..                      ...  \n",
+       "564                0.256996  \n",
+       "565               -0.108631  \n",
+       "566                0.520902  \n",
+       "567               -0.089362  \n",
+       "568               -0.047763  \n",
+       "\n",
+       "[569 rows x 10 columns]"
+      ]
+     },
+     "execution_count": 64,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "pca = PCA(n_components=10)\n",
+    "pComp = pca.fit_transform(Xscale) \n",
+    "pData = pd.DataFrame(data = pComp \n",
+    "             , columns = ['principal component 1', 'principal component 2', 'principal component 3','principal component 4', 'principal component 5', 'principal component 6', 'principal component 7', 'principal component 8', 'principal component 9', 'principal component 10']) \n",
+    "pData"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 65,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Problem 3\n",
+    "from sklearn.discriminant_analysis import LinearDiscriminantAnalysis"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 66,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lda = LinearDiscriminantAnalysis(n_components=1)\n",
+    "lda_t = lda.fit_transform(X,Y) "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 68,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Accuracy =  0.9473684210526315\n",
+      "Precision =  0.922077922077922\n",
+      "Recall =  1.0\n"
+     ]
+    }
+   ],
+   "source": [
+    "X_trainlda,X_testlda,Y_trainlda,Y_testlda = train_test_split(X,Y,test_size=0.2) \n",
+    "lda.fit(X_trainlda,Y_trainlda) \n",
+    "predictYlda = lda.predict(X_testlda) \n",
+    "acc = metrics.accuracy_score(Y_testlda, predictYlda)\n",
+    "prec = metrics.precision_score(Y_testlda, predictYlda) \n",
+    "rec = metrics.recall_score(Y_testlda, predictYlda)\n",
+    "print(\"Accuracy = \", acc)\n",
+    "print(\"Precision = \", prec)\n",
+    "print(\"Recall = \", rec)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
